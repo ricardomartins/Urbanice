@@ -2,6 +2,7 @@ package pt.rikmartins.urbaniceandroid;
 
 import android.net.Uri;
 import android.provider.BaseColumns;
+
 /**
  * Created by ricardo on 05-11-2014.
  */
@@ -61,6 +62,7 @@ public final class UrbaniceContract {
         public static final String TABLE_NAME = "ponto";
         public static final String COLUMN_NAME_LATITUDE = "latitude";
         public static final String COLUMN_NAME_LONGITUDE = "longitude";
+        public static final String COLUMN_NAME_ALTITUDE = "altitude";
     }
 
     public static abstract class PontoDoTracado implements BaseColumns {
@@ -76,8 +78,14 @@ public final class UrbaniceContract {
 
     public static abstract class TracadoDaLinha implements BaseColumns {
         public static final String TABLE_NAME = "tracado_da_linha";
-        public static final String COLUMN_NAME_ID_LINHA = "id_linha";
         public static final String COLUMN_NAME_ID_TRACADO = "id_tracado";
+        public static final String COLUMN_NAME_ID_LINHA = "id_linha";
+    }
+
+    public static abstract class Versao implements BaseColumns {
+        public static final String TABLE_NAME = "versao";
+        public static final String COLUMN_NAME_DESIGNACAO = "designacao";
+        public static final String COLUMN_NAME_VALOR = "valor";
     }
 }
 
