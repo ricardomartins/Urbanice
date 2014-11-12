@@ -16,6 +16,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:name="pt.rikmartins.urbaniceandroid.UrbaniceContentProvider"
+            android:authorities="pt.rikmartins.androiddev.urbaniceandroid.provider"
+            android:enabled="true"
+            android:exported="false" >
+        </provider>
     </application>
 
 </manifest>
