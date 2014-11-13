@@ -307,6 +307,8 @@ public class UrbaniceContentProvider extends ContentProvider {
      * Created by ricardo on 10-11-2014.
      */
     public static final class ProviderContract {
+        private ProviderContract(){}
+
         public static final String AUTHORITY = "pt.rikmartins.androiddev.urbaniceandroid.provider";
 
         public static abstract class Linha extends DbContract.Linha {

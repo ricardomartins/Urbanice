@@ -194,11 +194,6 @@ public class UrbaniceDbHelper extends SQLiteOpenHelper {
      * Created by ricardo on 05-11-2014.
      */
     public static final class DbContract {
-        /** The authority for the contacts provider */
-        public static final String AUTORIDADE = "pt.rikmartins.androiddev.TransportesGuarda.provider";
-        /** A content:// style uri to the authority for the contacts provider */
-        public static final Uri URI_AUTORIDADE = Uri.parse("content://" + AUTORIDADE);
-
         private DbContract(){}
 
         public static abstract class Corrida implements BaseColumns {
