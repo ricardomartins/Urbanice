@@ -310,6 +310,7 @@ public class UrbaniceContentProvider extends ContentProvider {
         private ProviderContract(){}
 
         public static final String AUTHORITY = "pt.rikmartins.androiddev.urbaniceandroid.provider";
+        public static final Uri AUTHORITY_URI = Uri.parse("content://" + AUTHORITY);
 
         public static abstract class Linha extends DbContract.Linha {
             public static final int MATCH_LINHAS = 100;

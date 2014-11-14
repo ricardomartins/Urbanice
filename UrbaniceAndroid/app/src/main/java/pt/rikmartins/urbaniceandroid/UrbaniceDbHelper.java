@@ -1,8 +1,10 @@
 package pt.rikmartins.urbaniceandroid;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -188,6 +190,16 @@ public class UrbaniceDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_DELETE_TRACADO_DA_LINHA);
         db.execSQL(SQL_DELETE_VERSAO);
         onCreate(db);
+    }
+
+    public Cursor queryAllLinha(){
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        qb.
+        return null;
+    }
+
+    public Cursor querySingleLinha(int id_linha){
+        return null;
     }
 
     /**
