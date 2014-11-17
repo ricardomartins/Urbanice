@@ -10,20 +10,11 @@ import android.net.Uri;
 import java.util.HashMap;
 
 import static pt.rikmartins.urbaniceandroid.UrbaniceContentProvider.ProviderContract.*;
-import static pt.rikmartins.urbaniceandroid.UrbaniceDbHelper.DbContract;
 
 public class UrbaniceContentProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher;
 
     private UrbaniceDbHelper urbaniceDbHelper;
-
-    private static HashMap<String, String> linhaProjectionMap;
-    private static HashMap<String, String> corridaProjectionMap;
-    private static HashMap<String, String> tracadoProjectionMap;
-    private static HashMap<String, String> estacaoProjectionMap;
-    private static HashMap<String, String> plataformaProjectionMap;
-    private static HashMap<String, String> paragemProjectionMap;
-    private static HashMap<String, String> pontoProjectionMap;
 
     static {
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -54,48 +45,6 @@ public class UrbaniceContentProvider extends ContentProvider {
 
         sUriMatcher.addURI(AUTHORITY, Ponto.TABLE_NAME, Ponto.MATCH_PONTOS);
         sUriMatcher.addURI(AUTHORITY, Ponto.TABLE_NAME + "/#", Ponto.MATCH_PONTO_ID);
-
-        linhaProjectionMap = new HashMap<String, String>();
-        linhaProjectionMap.put(Linha._ID, Linha._ID);
-        linhaProjectionMap.put(Linha.COLUMN_NAME_NOME, Linha.COLUMN_NAME_NOME);
-
-        corridaProjectionMap = new HashMap<String, String>();
-        corridaProjectionMap.put(Corrida._ID, Corrida._ID);
-        corridaProjectionMap.put(Corrida.COLUMN_NAME_ID_LINHA, Corrida.COLUMN_NAME_ID_LINHA);
-        corridaProjectionMap.put(Corrida.COLUMN_NAME_ACTIVA, Corrida.COLUMN_NAME_ACTIVA);
-        corridaProjectionMap.put(Corrida.COLUMN_NAME_NO_DOMINGO, Corrida.COLUMN_NAME_NO_DOMINGO);
-        corridaProjectionMap.put(Corrida.COLUMN_NAME_NA_SEGUNDA, Corrida.COLUMN_NAME_NA_SEGUNDA);
-        corridaProjectionMap.put(Corrida.COLUMN_NAME_NA_TERCA, Corrida.COLUMN_NAME_NA_TERCA);
-        corridaProjectionMap.put(Corrida.COLUMN_NAME_NA_QUARTA, Corrida.COLUMN_NAME_NA_QUARTA);
-        corridaProjectionMap.put(Corrida.COLUMN_NAME_NA_QUINTA, Corrida.COLUMN_NAME_NA_QUINTA);
-        corridaProjectionMap.put(Corrida.COLUMN_NAME_NA_SEXTA, Corrida.COLUMN_NAME_NA_SEXTA);
-        corridaProjectionMap.put(Corrida.COLUMN_NAME_NO_SABADO, Corrida.COLUMN_NAME_NO_SABADO);
-
-        tracadoProjectionMap = new HashMap<String, String>();
-        tracadoProjectionMap.put(Tracado._ID, Tracado._ID);
-
-        estacaoProjectionMap = new HashMap<String, String>();
-        estacaoProjectionMap.put(Estacao._ID, Estacao._ID);
-        estacaoProjectionMap.put(Estacao.COLUMN_NAME_ID_PONTO, Estacao.COLUMN_NAME_ID_PONTO);
-        estacaoProjectionMap.put(Estacao.COLUMN_NAME_NOME, Estacao.COLUMN_NAME_NOME);
-
-        plataformaProjectionMap = new HashMap<String, String>();
-        plataformaProjectionMap.put(Plataforma._ID, Plataforma._ID);
-        plataformaProjectionMap.put(Plataforma.COLUMN_NAME_ID_ESTACAO, Plataforma.COLUMN_NAME_ID_ESTACAO);
-        plataformaProjectionMap.put(Plataforma.COLUMN_NAME_ID_PONTO, Plataforma.COLUMN_NAME_ID_PONTO);
-
-        paragemProjectionMap = new HashMap<String, String>();
-        paragemProjectionMap.put(Paragem._ID, Paragem._ID);
-        paragemProjectionMap.put(Paragem.COLUMN_NAME_ID_CORRIDA, Paragem.COLUMN_NAME_ID_CORRIDA);
-        paragemProjectionMap.put(Paragem.COLUMN_NAME_ID_PLATAFORMA, Paragem.COLUMN_NAME_ID_PLATAFORMA);
-        paragemProjectionMap.put(Paragem.COLUMN_NAME_HORA_DO_DIA, Paragem.COLUMN_NAME_HORA_DO_DIA);
-        paragemProjectionMap.put(Paragem.COLUMN_NAME_MINUTO_DA_HORA, Paragem.COLUMN_NAME_MINUTO_DA_HORA);
-
-        pontoProjectionMap = new HashMap<String, String>();
-        pontoProjectionMap.put(Ponto._ID, Ponto._ID);
-        pontoProjectionMap.put(Ponto.COLUMN_NAME_LATITUDE, Ponto.COLUMN_NAME_LATITUDE);
-        pontoProjectionMap.put(Ponto.COLUMN_NAME_LONGITUDE, Ponto.COLUMN_NAME_LONGITUDE);
-        pontoProjectionMap.put(Ponto.COLUMN_NAME_ALTITUDE, Ponto.COLUMN_NAME_ALTITUDE);
     }
 
     @Override
@@ -107,47 +56,49 @@ public class UrbaniceContentProvider extends ContentProvider {
 
     public Cursor queryLinha(Uri uri, String[] projection, String selection,
                              String[] selectionArgs, String sortOrder, int uriMatch) {
-        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-
+        Cursor cursor;
         switch (uriMatch) {
             case Linha.MATCH_LINHA_ID:
-                qb.appendWhere(
-                        DbContract.Linha._ID + "=" +
-                                uri.getPathSegments().get(1)); // TODO: Criar constante para o 1
+                cursor = urbaniceDbHelper.querySingleLinha(Integer.valueOf(uri.getLastPathSegment()), null);
+                break;
             case Linha.MATCH_LINHAS:
-                qb.setTables(DbContract.Linha.TABLE_NAME);
-                qb.setProjectionMap(linhaProjectionMap);
+                cursor = urbaniceDbHelper.queryAllLinha(null, null, null);
                 break;
             case Linha.MATCH_LINHA_CORRIDAS:
-                qb.setTables(DbContract.Corrida.TABLE_NAME);
+                qb.setTables(UrbaniceDbHelper.DbContract.Corrida.TABLE_NAME);
                 qb.setProjectionMap(corridaProjectionMap);
                 qb.appendWhere(
-                        DbContract.Corrida.COLUMN_NAME_ID_LINHA + "=" +
+                        UrbaniceDbHelper.DbContract.Corrida.COLUMN_NAME_ID_LINHA + "=" +
                                 uri.getPathSegments().get(1)); // TODO: Criar constante para o 1
                 break;
             case Linha.MATCH_LINHA_TRACADOS:
-                qb.setTables(DbContract.Tracado.TABLE_NAME + " JOIN " +
-                        DbContract.TracadoDaLinha.TABLE_NAME + " ON " +
-                        DbContract.Tracado.TABLE_NAME + "." + DbContract.Tracado._ID + " = " +
-                        DbContract.TracadoDaLinha.TABLE_NAME + "." + DbContract.TracadoDaLinha.COLUMN_NAME_ID_TRACADO);
+                qb.setTables(UrbaniceDbHelper.DbContract.Tracado.TABLE_NAME + " JOIN " +
+                        UrbaniceDbHelper.DbContract.TracadoDaLinha.TABLE_NAME + " ON " +
+                        UrbaniceDbHelper.DbContract.Tracado.TABLE_NAME + "." + UrbaniceDbHelper.DbContract.Tracado._ID + " = " +
+                        UrbaniceDbHelper.DbContract.TracadoDaLinha.TABLE_NAME + "." + UrbaniceDbHelper.DbContract.TracadoDaLinha.COLUMN_NAME_ID_TRACADO);
                 qb.setProjectionMap(tracadoProjectionMap);
                 qb.appendWhere(
-                        DbContract.TracadoDaLinha.COLUMN_NAME_ID_LINHA + "=" +
+                        UrbaniceDbHelper.DbContract.TracadoDaLinha.COLUMN_NAME_ID_LINHA + "=" +
                                 uri.getPathSegments().get(1)); // TODO: Criar constante para o 1
                 break;
             case Linha.MATCH_LINHA_ESTACOES:
-                qb.setTables(DbContract.Estacao.TABLE_NAME + " JOIN " +
-                        DbContract.EstacaoDaLinha.TABLE_NAME + " ON " +
-                        DbContract.Estacao.TABLE_NAME + "." + DbContract.Estacao._ID + " = " +
-                        DbContract.EstacaoDaLinha.TABLE_NAME + "." + DbContract.EstacaoDaLinha.COLUMN_NAME_ID_ESTACAO);
+                qb.setTables(UrbaniceDbHelper.DbContract.Estacao.TABLE_NAME + " JOIN " +
+                        UrbaniceDbHelper.DbContract.EstacaoDaLinha.TABLE_NAME + " ON " +
+                        UrbaniceDbHelper.DbContract.Estacao.TABLE_NAME + "." + UrbaniceDbHelper.DbContract.Estacao._ID + " = " +
+                        UrbaniceDbHelper.DbContract.EstacaoDaLinha.TABLE_NAME + "." + UrbaniceDbHelper.DbContract.EstacaoDaLinha.COLUMN_NAME_ID_ESTACAO);
                 qb.setProjectionMap(estacaoProjectionMap);
                 qb.appendWhere(
-                        DbContract.EstacaoDaLinha.COLUMN_NAME_ID_LINHA + "=" +
+                        UrbaniceDbHelper.DbContract.EstacaoDaLinha.COLUMN_NAME_ID_LINHA + "=" +
                                 uri.getPathSegments().get(1)); // TODO: Criar constante para o 1
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
+
+        // Tells the Cursor what URI to watch, so it knows when its source data changes
+        cursor.setNotificationUri(getContext().getContentResolver(), uri); // TODO: Isto tem que ser feito no Content Provider
+
+        return cursor;
     }
 
     public Cursor queryCorrida(Uri uri, String[] projection, String selection,
@@ -245,36 +196,6 @@ public class UrbaniceContentProvider extends ContentProvider {
 //        }
 //
 //
-//        String orderBy;
-//        // If no sort order is specified, uses the default
-//        if (TextUtils.isEmpty(sortOrder)) {
-//            orderBy = NotePad.Notes.DEFAULT_SORT_ORDER;
-//        } else {
-//            // otherwise, uses the incoming sort order
-//            orderBy = sortOrder;
-//        }
-//
-//        // Opens the database object in "read" mode, since no writes need to be done.
-//        SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-//
-//       /*
-//        * Performs the query. If no problems occur trying to read the database, then a Cursor
-//        * object is returned; otherwise, the cursor variable contains null. If no records were
-//        * selected, then the Cursor object is empty, and Cursor.getCount() returns 0.
-//        */
-//        Cursor c = qb.query(
-//                db,            // The database to query
-//                projection,    // The columns to return from the query
-//                selection,     // The columns for the where clause
-//                selectionArgs, // The values for the where clause
-//                null,          // don't group the rows
-//                null,          // don't filter by row groups
-//                orderBy        // The sort order
-//        );
-//
-//        // Tells the Cursor what URI to watch, so it knows when its source data changes
-//        c.setNotificationUri(getContext().getContentResolver(), uri);
-//        return c;
     }
 
     @Override
@@ -312,7 +233,7 @@ public class UrbaniceContentProvider extends ContentProvider {
         public static final String AUTHORITY = "pt.rikmartins.androiddev.urbaniceandroid.provider";
         public static final Uri AUTHORITY_URI = Uri.parse("content://" + AUTHORITY);
 
-        public static abstract class Linha extends DbContract.Linha {
+        public static abstract class Linha extends UrbaniceDbHelper.DbContract.Linha {
             public static final int MATCH_LINHAS = 100;
             public static final int MATCH_LINHA_ID = MATCH_LINHAS + 1;
             public static final int MATCH_LINHA_CORRIDAS = MATCH_LINHAS + 10;
@@ -320,36 +241,36 @@ public class UrbaniceContentProvider extends ContentProvider {
             public static final int MATCH_LINHA_ESTACOES = MATCH_LINHAS + 30;
         }
 
-        public static abstract class Corrida extends DbContract.Corrida {
+        public static abstract class Corrida extends UrbaniceDbHelper.DbContract.Corrida {
             public static final int MATCH_CORRIDAS = 200;
             public static final int MATCH_CORRIDA_ID = MATCH_CORRIDAS + 1;
             public static final int MATCH_CORRIDA_PARAGENS = MATCH_CORRIDAS + 10;
         }
 
-        public static abstract class Tracado extends DbContract.Tracado {
+        public static abstract class Tracado extends UrbaniceDbHelper.DbContract.Tracado {
             public static final int MATCH_TRACADOS = 300;
             public static final int MATCH_TRACADO_ID = MATCH_TRACADOS + 1;
             public static final int MATCH_TRACADO_PONTOS = MATCH_TRACADOS + 10;
         }
 
-        public static abstract class Estacao extends DbContract.Estacao {
+        public static abstract class Estacao extends UrbaniceDbHelper.DbContract.Estacao {
             public static final int MATCH_ESTACOES = 400;
             public static final int MATCH_ESTACAO_ID = MATCH_ESTACOES + 1;
             public static final int MATCH_ESTACAO_PLATAFORMAS = MATCH_ESTACOES + 10;
         }
 
-        public static abstract class Plataforma extends DbContract.Plataforma {
+        public static abstract class Plataforma extends UrbaniceDbHelper.DbContract.Plataforma {
             public static final int MATCH_PLATAFORMAS = 500;
             public static final int MATCH_PLATAFORMA_ID = MATCH_PLATAFORMAS + 1;
             public static final int MATCH_PLATAFORMA_PARAGENS = MATCH_PLATAFORMAS + 10;
         }
 
-        public static abstract class Paragem extends DbContract.Paragem {
+        public static abstract class Paragem extends UrbaniceDbHelper.DbContract.Paragem {
             public static final int MATCH_PARAGENS = 600;
             public static final int MATCH_PARAGEM_ID = MATCH_PARAGENS + 1;
         }
 
-        public static abstract class Ponto extends DbContract.Ponto {
+        public static abstract class Ponto extends UrbaniceDbHelper.DbContract.Ponto {
             public static final int MATCH_PONTOS = 700;
             public static final int MATCH_PONTO_ID = MATCH_PONTOS + 1;
         }
