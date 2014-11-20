@@ -64,33 +64,33 @@ public class UrbaniceContentProvider extends ContentProvider {
             case Linha.MATCH_LINHAS:
                 cursor = urbaniceDbHelper.queryAllLinha(null, null, null);
                 break;
-            case Linha.MATCH_LINHA_CORRIDAS:
-                qb.setTables(UrbaniceDbHelper.DbContract.Corrida.TABLE_NAME);
-                qb.setProjectionMap(corridaProjectionMap);
-                qb.appendWhere(
-                        UrbaniceDbHelper.DbContract.Corrida.COLUMN_NAME_ID_LINHA + "=" +
-                                uri.getPathSegments().get(1)); // TODO: Criar constante para o 1
-                break;
-            case Linha.MATCH_LINHA_TRACADOS:
-                qb.setTables(UrbaniceDbHelper.DbContract.Tracado.TABLE_NAME + " JOIN " +
-                        UrbaniceDbHelper.DbContract.TracadoDaLinha.TABLE_NAME + " ON " +
-                        UrbaniceDbHelper.DbContract.Tracado.TABLE_NAME + "." + UrbaniceDbHelper.DbContract.Tracado._ID + " = " +
-                        UrbaniceDbHelper.DbContract.TracadoDaLinha.TABLE_NAME + "." + UrbaniceDbHelper.DbContract.TracadoDaLinha.COLUMN_NAME_ID_TRACADO);
-                qb.setProjectionMap(tracadoProjectionMap);
-                qb.appendWhere(
-                        UrbaniceDbHelper.DbContract.TracadoDaLinha.COLUMN_NAME_ID_LINHA + "=" +
-                                uri.getPathSegments().get(1)); // TODO: Criar constante para o 1
-                break;
-            case Linha.MATCH_LINHA_ESTACOES:
-                qb.setTables(UrbaniceDbHelper.DbContract.Estacao.TABLE_NAME + " JOIN " +
-                        UrbaniceDbHelper.DbContract.EstacaoDaLinha.TABLE_NAME + " ON " +
-                        UrbaniceDbHelper.DbContract.Estacao.TABLE_NAME + "." + UrbaniceDbHelper.DbContract.Estacao._ID + " = " +
-                        UrbaniceDbHelper.DbContract.EstacaoDaLinha.TABLE_NAME + "." + UrbaniceDbHelper.DbContract.EstacaoDaLinha.COLUMN_NAME_ID_ESTACAO);
-                qb.setProjectionMap(estacaoProjectionMap);
-                qb.appendWhere(
-                        UrbaniceDbHelper.DbContract.EstacaoDaLinha.COLUMN_NAME_ID_LINHA + "=" +
-                                uri.getPathSegments().get(1)); // TODO: Criar constante para o 1
-                break;
+//            case Linha.MATCH_LINHA_CORRIDAS:
+//                qb.setTables(UrbaniceDbHelper.DbContract.Corrida.TABLE_NAME);
+//                qb.setProjectionMap(corridaProjectionMap);
+//                qb.appendWhere(
+//                        UrbaniceDbHelper.DbContract.Corrida.COLUMN_NAME_ID_LINHA + "=" +
+//                                uri.getPathSegments().get(1)); // TODO: Criar constante para o 1
+//                break;
+//            case Linha.MATCH_LINHA_TRACADOS:
+//                qb.setTables(UrbaniceDbHelper.DbContract.Tracado.TABLE_NAME + " JOIN " +
+//                        UrbaniceDbHelper.DbContract.TracadoDaLinha.TABLE_NAME + " ON " +
+//                        UrbaniceDbHelper.DbContract.Tracado.TABLE_NAME + "." + UrbaniceDbHelper.DbContract.Tracado._ID + " = " +
+//                        UrbaniceDbHelper.DbContract.TracadoDaLinha.TABLE_NAME + "." + UrbaniceDbHelper.DbContract.TracadoDaLinha.COLUMN_NAME_ID_TRACADO);
+//                qb.setProjectionMap(tracadoProjectionMap);
+//                qb.appendWhere(
+//                        UrbaniceDbHelper.DbContract.TracadoDaLinha.COLUMN_NAME_ID_LINHA + "=" +
+//                                uri.getPathSegments().get(1)); // TODO: Criar constante para o 1
+//                break;
+//            case Linha.MATCH_LINHA_ESTACOES:
+//                qb.setTables(UrbaniceDbHelper.DbContract.Estacao.TABLE_NAME + " JOIN " +
+//                        UrbaniceDbHelper.DbContract.EstacaoDaLinha.TABLE_NAME + " ON " +
+//                        UrbaniceDbHelper.DbContract.Estacao.TABLE_NAME + "." + UrbaniceDbHelper.DbContract.Estacao._ID + " = " +
+//                        UrbaniceDbHelper.DbContract.EstacaoDaLinha.TABLE_NAME + "." + UrbaniceDbHelper.DbContract.EstacaoDaLinha.COLUMN_NAME_ID_ESTACAO);
+//                qb.setProjectionMap(estacaoProjectionMap);
+//                qb.appendWhere(
+//                        UrbaniceDbHelper.DbContract.EstacaoDaLinha.COLUMN_NAME_ID_LINHA + "=" +
+//                                uri.getPathSegments().get(1)); // TODO: Criar constante para o 1
+//                break;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
