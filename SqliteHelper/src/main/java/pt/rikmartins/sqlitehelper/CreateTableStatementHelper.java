@@ -17,38 +17,38 @@ public class CreateTableStatementHelper {
     private final static String COMMA_SEPARATOR = ", ";
     private final static String COLUMNS_DEFINITION_START = "(";
     private final static String COLUMNS_DEFINITION_END = ")";
+    private final static String LINE_TERMINATOR = ";";
 
+
+    final List<ColumnDefinition> columnDefinitions;
     String tableName;
     String databaseName;
-
     boolean temporary;
     boolean ifNotExists;
 
-    final List<ColumnDefinition> columnDefinitions;
-
-    public CreateTableStatementHelper(String tableName, String databaseName, boolean temporary, boolean ifNotExists){
-        this.tableName = tableName;
-        this.databaseName = databaseName;
+    public CreateTableStatementHelper(String tableName, String databaseName, boolean temporary, boolean ifNotExists) {
+        if (tableName != null) setTableName(tableName);
+        if (databaseName != null) setDatabaseName(databaseName);
         this.temporary = temporary;
         this.ifNotExists = ifNotExists;
         columnDefinitions = new ArrayList<ColumnDefinition>();
     }
 
-    public CreateTableStatementHelper(String tableName){
+    public CreateTableStatementHelper(String tableName) {
         this(tableName, null, false, false);
     }
 
-    public CreateTableStatementHelper(){
+    public CreateTableStatementHelper() {
         this(null, null, false, false);
     }
 
-    public CreateTableStatementHelper(CreateTableStatementHelper createTableStatementHelper){
+    public CreateTableStatementHelper(CreateTableStatementHelper createTableStatementHelper) {
         this(createTableStatementHelper.tableName, createTableStatementHelper.databaseName, createTableStatementHelper.temporary,
                 createTableStatementHelper.ifNotExists);
         columnDefinitions.addAll(createTableStatementHelper.columnDefinitions);
     }
 
-    public boolean isReady(){
+    public boolean isReady() {
         if (tableName == null || tableName.trim().equals(""))
             return false;
         if (columnDefinitions.size() <= 0)
@@ -57,12 +57,12 @@ public class CreateTableStatementHelper {
         return true;
     }
 
-    public CreateTableStatementHelper addColumnDefinition(ColumnDefinition columnDefinition){
+    public CreateTableStatementHelper addColumnDefinition(ColumnDefinition columnDefinition) {
         columnDefinitions.add(columnDefinition);
         return this;
     }
 
-    public String getCreateTable(){
+    public String getCreateTable() {
         String result = CREATE + " ";
         if (temporary)
             result += TEMPORARY + " ";
@@ -75,7 +75,7 @@ public class CreateTableStatementHelper {
 
         result += COLUMNS_DEFINITION_START;
         Iterator<ColumnDefinition> columnDefinitionIterator = columnDefinitions.iterator();
-        while (true){
+        while (true) {
             result += columnDefinitionIterator.next().getColumnDefinition();
             if (columnDefinitionIterator.hasNext())
                 result += COMMA_SEPARATOR;
@@ -92,7 +92,7 @@ public class CreateTableStatementHelper {
     }
 
     public void setTableName(String tableName) {
-        this.tableName = tableName;
+        this.tableName = tableName.trim();
     }
 
     public String getDatabaseName() {
@@ -100,7 +100,7 @@ public class CreateTableStatementHelper {
     }
 
     public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
+        this.databaseName = databaseName.trim();
     }
 
     public boolean isTemporary() {

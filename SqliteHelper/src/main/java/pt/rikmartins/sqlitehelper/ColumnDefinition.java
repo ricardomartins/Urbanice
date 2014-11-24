@@ -1,23 +1,48 @@
 package pt.rikmartins.sqlitehelper;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Created by ricardo on 15-11-2014.
  */
 public class ColumnDefinition {
-    private static final String TEXT_TYPE = " TEXT";
-    private static final String INTEGER_TYPE = " INTEGER";
-    private static final String DOUBLE_TYPE = " DOUBLE";
-    private static final String BOOL_TYPE = " BOOL";
-    private static final String NOT_NULL_CONSTRAINT = " NOT NULL";
-    private static final String PRIMARY_KEY_CONSTRAINT = " PRIMARY KEY";
-    private static final String UNIQUE_CONSTRAINT = " UNIQUE";
-    private static final String DEFAULT_CONSTRAINT = " DEFAULT ";
+    public static final int TEXT_TYPE = 1001;
+    public static final int INTEGER_TYPE = 1002;
+    public static final int DOUBLE_TYPE = 1003;
+    public static final int BOOL_TYPE = 1004;
+
+    public static final int NOT_NULL_CONSTRAINT = 2001;
+    public static final int PRIMARY_KEY_CONSTRAINT = 2002;
+    public static final int UNIQUE_CONSTRAINT = 2003;
+    public static final int DEFAULT_CONSTRAINT = 2501;
+
     private static final String COMMA_SEP = ",";
+
+    private static final Map<Integer, String> objects;
+    static {
+        objects = new HashMap<Integer, String>();
+
+        objects.put(TEXT_TYPE, "TEXT");
+        objects.put(INTEGER_TYPE, "INTEGER");
+        objects.put(DOUBLE_TYPE, "DOUBLE");
+        objects.put(BOOL_TYPE, "BOOL");
+
+        objects.put(NOT_NULL_CONSTRAINT, "NOT NULL");
+        objects.put(PRIMARY_KEY_CONSTRAINT, "PRIMARY KEY");
+        objects.put(UNIQUE_CONSTRAINT, "UNIQUE");
+        objects.put(DEFAULT_CONSTRAINT, "DEFAULT");
+    }
+
+    private Set<Integer> coiso; // TODO: Mudar o nome
 
     final String columnName;
 
-    public ColumnDefinition(String columnName){
-        this.columnName = columnName;
+    int type;
+
+    public ColumnDefinition(String columnName, int type){
+        this.columnName = columnName.trim();
     }
 
     public String getColumnDefinition(){
