@@ -1,52 +1,101 @@
 package pt.rikmartins.sqlitehelper;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by ricardo on 15-11-2014.
  */
 public class ColumnDefinition {
-    public static final int TEXT_TYPE = 1001;
-    public static final int INTEGER_TYPE = 1002;
-    public static final int DOUBLE_TYPE = 1003;
-    public static final int BOOL_TYPE = 1004;
+    public static final String DEFAULT_PSEUDO_CONSTRAINT = "DEFAULT";
 
-    public static final int NOT_NULL_CONSTRAINT = 2001;
-    public static final int PRIMARY_KEY_CONSTRAINT = 2002;
-    public static final int UNIQUE_CONSTRAINT = 2003;
-    public static final int DEFAULT_CONSTRAINT = 2501;
+    private static final Pattern columnNamePattern = Pattern.compile("[a-zA-Z_][a-zA-Z0-9_]*");
 
-    private static final String COMMA_SEP = ",";
+    public enum TypeName {
+        TEXT("TEXT"),
+        INTEGER("INTEGER"),
+        DOUBLE("DOUBLE"),
+        BOOL("BOOL");
 
-    private static final Map<Integer, String> objects;
-    static {
-        objects = new HashMap<Integer, String>();
+        private String typeName;
 
-        objects.put(TEXT_TYPE, "TEXT");
-        objects.put(INTEGER_TYPE, "INTEGER");
-        objects.put(DOUBLE_TYPE, "DOUBLE");
-        objects.put(BOOL_TYPE, "BOOL");
+        private TypeName(String typeName) {
+            this.typeName = typeName;
+        }
 
-        objects.put(NOT_NULL_CONSTRAINT, "NOT NULL");
-        objects.put(PRIMARY_KEY_CONSTRAINT, "PRIMARY KEY");
-        objects.put(UNIQUE_CONSTRAINT, "UNIQUE");
-        objects.put(DEFAULT_CONSTRAINT, "DEFAULT");
+        public String getTypeName() {
+            return typeName;
+        }
+
     }
 
-    private Set<Integer> coiso; // TODO: Mudar o nome
+    public enum ColumnConstraint {
+        NOT_NULL("NOT NULL"),
+        PRIMARY_KEY("PRIMARY KEY"),
+        UNIQUE("UNIQUE");
+
+        private String constraintName;
+
+        private ColumnConstraint(String constraintName) {
+            this.constraintName = constraintName;
+        }
+
+        public String getConstraintName() {
+            return constraintName;
+        }
+
+    }
 
     final String columnName;
 
-    int type;
+    private Set<TypeName> typeNames;
 
-    public ColumnDefinition(String columnName, int type){
-        this.columnName = columnName.trim();
+    private Set<ColumnConstraint> columnConstraints;
+
+    private String defaultValue;
+
+    public ColumnDefinition(String columnName) throws SqliteHelperException {
+        Matcher m = columnNamePattern.matcher(columnName);
+        if (!m.find())
+            throw new SqliteHelperException("Malformed column name");
+        this.columnName = m.group();
+
+        typeNames = new HashSet<TypeName>();
+        columnConstraints = new HashSet<ColumnConstraint>();
+        resetDefault();
     }
 
-    public String getColumnDefinition(){
-        return columnName;
+    public void addTypeName(TypeName typeName) {
+        typeNames.add(typeName);
+    }
+
+    public void addColumnConstraint(ColumnConstraint columnConstraint) {
+        columnConstraints.add(columnConstraint);
+    }
+
+    public String setDefault(String defaultValue) {
+        this.defaultValue = defaultValue;
+        return getDefault();
+    }
+
+    public String resetDefault() {
+        defaultValue = null;
+        return getDefault();
+    }
+
+    public String getDefault() {
+        return defaultValue == null ? "" : ColumnDefinition.DEFAULT_PSEUDO_CONSTRAINT + " " + defaultValue;
+    }
+
+    public String getColumnDefinition() {
+        String result = columnName + " ";
+        for (TypeName typeName : typeNames)
+            result += typeName.getTypeName() + " ";
+        for (ColumnConstraint columnConstraint : columnConstraints)
+            result += columnConstraint.getConstraintName() + " ";
+        return result.trim();
     }
 
     public String getColumnName() {
