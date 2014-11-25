@@ -86,7 +86,7 @@ public class ColumnDefinition {
     }
 
     public String getDefault() {
-        return defaultValue == null ? "" : ColumnDefinition.DEFAULT_PSEUDO_CONSTRAINT + " " + defaultValue;
+        return (defaultValue == null) ? "" : (ColumnDefinition.DEFAULT_PSEUDO_CONSTRAINT + " " + defaultValue);
     }
 
     public String getColumnDefinition() {
@@ -95,6 +95,8 @@ public class ColumnDefinition {
             result += typeName.getTypeName() + " ";
         for (ColumnConstraint columnConstraint : columnConstraints)
             result += columnConstraint.getConstraintName() + " ";
+        if (defaultValue != null)
+            result += getDefault();
         return result.trim();
     }
 

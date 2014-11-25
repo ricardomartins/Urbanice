@@ -1,5 +1,6 @@
 package pt.rikmartins.urbaniceandroid;
 
+import android.animation.AnimatorSet;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -8,6 +9,8 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.provider.BaseColumns;
 
 import java.util.HashMap;
+
+import pt.rikmartins.sqlitehelper.CreateTableStatementHelper;
 
 import static pt.rikmartins.urbaniceandroid.UrbaniceDbHelper.DbContract.Corrida;
 import static pt.rikmartins.urbaniceandroid.UrbaniceDbHelper.DbContract.Estacao;
@@ -29,33 +32,27 @@ public class UrbaniceDbHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "urbanice.db";
 
-    private static final String TEXT_TYPE = " TEXT";
-    private static final String INTEGER_TYPE = " INTEGER";
-    private static final String DOUBLE_TYPE = " DOUBLE";
-    private static final String BOOL_TYPE = " BOOL";
 
-    private static final String NOT_NULL_CONSTRAINT = " NOT NULL";
-    private static final String PRIMARY_KEY_CONSTRAINT = " PRIMARY KEY";
-    private static final String SQL_CREATE_TRACADO =
-            "CREATE TABLE " + Tracado.TABLE_NAME + " ( " +
-                    Tracado._ID + INTEGER_TYPE + PRIMARY_KEY_CONSTRAINT +
-                    " )";
-    private static final String UNIQUE_CONSTRAINT = " UNIQUE";
-    private static final String DEFAULT_CONSTRAINT = " DEFAULT ";
-    private static final String COMMA_SEP = ",";
-    private static final String SQL_CREATE_CORRIDA =
-            "CREATE TABLE " + Corrida.TABLE_NAME + " ( " +
-                    Corrida._ID + INTEGER_TYPE + PRIMARY_KEY_CONSTRAINT + COMMA_SEP +
-                    Corrida.COLUMN_NAME_ID_LINHA + INTEGER_TYPE + NOT_NULL_CONSTRAINT + COMMA_SEP +
-                    Corrida.COLUMN_NAME_ACTIVA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
-                    Corrida.COLUMN_NAME_NO_DOMINGO + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
-                    Corrida.COLUMN_NAME_NA_SEGUNDA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
-                    Corrida.COLUMN_NAME_NA_TERCA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
-                    Corrida.COLUMN_NAME_NA_QUARTA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
-                    Corrida.COLUMN_NAME_NA_QUINTA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
-                    Corrida.COLUMN_NAME_NA_SEXTA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
-                    Corrida.COLUMN_NAME_NO_SABADO + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" +
-                    " )";
+
+    private static final String SQL_CREATE_CORRIDA;
+
+    static {
+        CreateTableStatementHelper tabelaBase = new CreateTableStatementHelper();
+        SQL_CREATE_CORRIDA =
+        "CREATE TABLE " + Corrida.TABLE_NAME + " ( " +
+                Corrida._ID + INTEGER_TYPE + PRIMARY_KEY_CONSTRAINT + COMMA_SEP +
+                Corrida.COLUMN_NAME_ID_LINHA + INTEGER_TYPE + NOT_NULL_CONSTRAINT + COMMA_SEP +
+                Corrida.COLUMN_NAME_ACTIVA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
+                Corrida.COLUMN_NAME_NO_DOMINGO + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
+                Corrida.COLUMN_NAME_NA_SEGUNDA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
+                Corrida.COLUMN_NAME_NA_TERCA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
+                Corrida.COLUMN_NAME_NA_QUARTA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
+                Corrida.COLUMN_NAME_NA_QUINTA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
+                Corrida.COLUMN_NAME_NA_SEXTA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
+                Corrida.COLUMN_NAME_NO_SABADO + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" +
+                " )";
+    }
+
     private static final String SQL_CREATE_ESTACAO =
             "CREATE TABLE " + Estacao.TABLE_NAME + " ( " +
                     Estacao._ID + INTEGER_TYPE + PRIMARY_KEY_CONSTRAINT + COMMA_SEP +
