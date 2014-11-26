@@ -20,11 +20,11 @@ public class CreateTableStatementHelper {
     private final static String LINE_TERMINATOR = ";";
 
 
-    final List<ColumnDefinition> columnDefinitions;
     String tableName;
     String databaseName;
     boolean temporary;
     boolean ifNotExists;
+    final List<ColumnDefinition> columnDefinitions;
 
     public CreateTableStatementHelper(String tableName, String databaseName, boolean temporary, boolean ifNotExists) {
         if (tableName != null) setTableName(tableName);
@@ -57,9 +57,8 @@ public class CreateTableStatementHelper {
         return true;
     }
 
-    public CreateTableStatementHelper addColumnDefinition(ColumnDefinition columnDefinition) {
+    public void addColumnDefinition(ColumnDefinition columnDefinition) {
         columnDefinitions.add(columnDefinition);
-        return this;
     }
 
     public String getCreateTable() {
@@ -122,4 +121,5 @@ public class CreateTableStatementHelper {
     public List<ColumnDefinition> getColumnDefinitions() {
         return columnDefinitions;
     }
+
 }

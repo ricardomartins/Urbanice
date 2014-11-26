@@ -1,6 +1,5 @@
 package pt.rikmartins.urbaniceandroid;
 
-import android.animation.AnimatorSet;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,8 +9,12 @@ import android.provider.BaseColumns;
 
 import java.util.HashMap;
 
+import pt.rikmartins.sqlitehelper.ColumnDefinition;
 import pt.rikmartins.sqlitehelper.CreateTableStatementHelper;
+import pt.rikmartins.sqlitehelper.SqliteHelperException;
 
+import static pt.rikmartins.sqlitehelper.ColumnDefinition.ColumnConstraint;
+import static pt.rikmartins.sqlitehelper.ColumnDefinition.TypeName;
 import static pt.rikmartins.urbaniceandroid.UrbaniceDbHelper.DbContract.Corrida;
 import static pt.rikmartins.urbaniceandroid.UrbaniceDbHelper.DbContract.Estacao;
 import static pt.rikmartins.urbaniceandroid.UrbaniceDbHelper.DbContract.EstacaoDaLinha;
@@ -32,117 +35,29 @@ public class UrbaniceDbHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "urbanice.db";
 
-
-
-    private static final String SQL_CREATE_CORRIDA;
-
-    static {
-        CreateTableStatementHelper tabelaBase = new CreateTableStatementHelper();
-        SQL_CREATE_CORRIDA =
-        "CREATE TABLE " + Corrida.TABLE_NAME + " ( " +
-                Corrida._ID + INTEGER_TYPE + PRIMARY_KEY_CONSTRAINT + COMMA_SEP +
-                Corrida.COLUMN_NAME_ID_LINHA + INTEGER_TYPE + NOT_NULL_CONSTRAINT + COMMA_SEP +
-                Corrida.COLUMN_NAME_ACTIVA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
-                Corrida.COLUMN_NAME_NO_DOMINGO + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
-                Corrida.COLUMN_NAME_NA_SEGUNDA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
-                Corrida.COLUMN_NAME_NA_TERCA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
-                Corrida.COLUMN_NAME_NA_QUARTA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
-                Corrida.COLUMN_NAME_NA_QUINTA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
-                Corrida.COLUMN_NAME_NA_SEXTA + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" + COMMA_SEP +
-                Corrida.COLUMN_NAME_NO_SABADO + BOOL_TYPE + NOT_NULL_CONSTRAINT + DEFAULT_CONSTRAINT + "0" +
-                " )";
-    }
-
-    private static final String SQL_CREATE_ESTACAO =
-            "CREATE TABLE " + Estacao.TABLE_NAME + " ( " +
-                    Estacao._ID + INTEGER_TYPE + PRIMARY_KEY_CONSTRAINT + COMMA_SEP +
-                    Estacao.COLUMN_NAME_ID_PONTO + INTEGER_TYPE + COMMA_SEP +
-                    Estacao.COLUMN_NAME_NOME + TEXT_TYPE + NOT_NULL_CONSTRAINT + UNIQUE_CONSTRAINT +
-                    " )";
-    private static final String SQL_CREATE_ESTACAO_DA_LINHA =
-            "CREATE TABLE " + EstacaoDaLinha.TABLE_NAME + " ( " +
-                    EstacaoDaLinha._ID + INTEGER_TYPE + PRIMARY_KEY_CONSTRAINT + COMMA_SEP +
-                    EstacaoDaLinha.COLUMN_NAME_ID_ESTACAO + INTEGER_TYPE + NOT_NULL_CONSTRAINT + COMMA_SEP +
-                    EstacaoDaLinha.COLUMN_NAME_ID_LINHA + INTEGER_TYPE + NOT_NULL_CONSTRAINT +
-                    " )";
-    private static final String SQL_CREATE_LINHA =
-            "CREATE TABLE " + Linha.TABLE_NAME + " ( " +
-                    Linha._ID + INTEGER_TYPE + PRIMARY_KEY_CONSTRAINT + COMMA_SEP +
-                    Linha.COLUMN_NAME_NOME + TEXT_TYPE + NOT_NULL_CONSTRAINT +
-                    " )";
-    private static final String SQL_CREATE_PARAGEM =
-            "CREATE TABLE " + Paragem.TABLE_NAME + " ( " +
-                    Paragem._ID + INTEGER_TYPE + PRIMARY_KEY_CONSTRAINT + COMMA_SEP +
-                    Paragem.COLUMN_NAME_ID_CORRIDA + INTEGER_TYPE + NOT_NULL_CONSTRAINT + COMMA_SEP +
-                    Paragem.COLUMN_NAME_ID_PLATAFORMA + INTEGER_TYPE + NOT_NULL_CONSTRAINT + COMMA_SEP +
-                    Paragem.COLUMN_NAME_HORA_DO_DIA + INTEGER_TYPE + NOT_NULL_CONSTRAINT + COMMA_SEP +
-                    Paragem.COLUMN_NAME_MINUTO_DA_HORA + INTEGER_TYPE + NOT_NULL_CONSTRAINT +
-                    " )";
-    private static final String SQL_CREATE_PLATAFORMA =
-            "CREATE TABLE " + Plataforma.TABLE_NAME + " ( " +
-                    Plataforma._ID + INTEGER_TYPE + PRIMARY_KEY_CONSTRAINT + COMMA_SEP +
-                    Plataforma.COLUMN_NAME_ID_ESTACAO + INTEGER_TYPE + NOT_NULL_CONSTRAINT + COMMA_SEP +
-                    Plataforma.COLUMN_NAME_ID_PONTO + INTEGER_TYPE + NOT_NULL_CONSTRAINT +
-                    " )";
-    private static final String SQL_CREATE_PONTO =
-            "CREATE TABLE " + Ponto.TABLE_NAME + " ( " +
-                    Ponto._ID + INTEGER_TYPE + PRIMARY_KEY_CONSTRAINT + COMMA_SEP +
-                    Ponto.COLUMN_NAME_LATITUDE + DOUBLE_TYPE + NOT_NULL_CONSTRAINT + COMMA_SEP +
-                    Ponto.COLUMN_NAME_LONGITUDE + DOUBLE_TYPE + NOT_NULL_CONSTRAINT + COMMA_SEP +
-                    Ponto.COLUMN_NAME_ALTITUDE + DOUBLE_TYPE +
-                    " )";
-    private static final String SQL_CREATE_PONTO_DO_TRACADO =
-            "CREATE TABLE " + PontoDoTracado.TABLE_NAME + " ( " +
-                    PontoDoTracado._ID + INTEGER_TYPE + PRIMARY_KEY_CONSTRAINT + COMMA_SEP +
-                    PontoDoTracado.COLUMN_NAME_ID_PONTO + INTEGER_TYPE + NOT_NULL_CONSTRAINT + COMMA_SEP +
-                    PontoDoTracado.COLUMN_NAME_ID_TRACADO + INTEGER_TYPE + NOT_NULL_CONSTRAINT + COMMA_SEP +
-                    PontoDoTracado.COLUMN_NAME_ORDEM + INTEGER_TYPE + NOT_NULL_CONSTRAINT +
-                    " )";
-    private static final String SQL_CREATE_TRACADO_DA_LINHA =
-            "CREATE TABLE " + TracadoDaLinha.TABLE_NAME + " ( " +
-                    TracadoDaLinha._ID + INTEGER_TYPE + PRIMARY_KEY_CONSTRAINT + COMMA_SEP +
-                    TracadoDaLinha.COLUMN_NAME_ID_TRACADO + INTEGER_TYPE + NOT_NULL_CONSTRAINT + COMMA_SEP +
-                    TracadoDaLinha.COLUMN_NAME_ID_LINHA + INTEGER_TYPE + NOT_NULL_CONSTRAINT +
-                    " )";
-
-    private static final String SQL_CREATE_VERSAO =
-            "CREATE TABLE " + Versao.TABLE_NAME + " ( " +
-                    Versao.COLUMN_NAME_DESIGNACAO + TEXT_TYPE + NOT_NULL_CONSTRAINT + COMMA_SEP +
-                    Versao.COLUMN_NAME_VALOR + INTEGER_TYPE + NOT_NULL_CONSTRAINT +
-                    " )";
-
     private static final String SQL_DELETE_CORRIDA =
             "DROP TABLE IF EXISTS " + Corrida.TABLE_NAME;
-
     private static final String SQL_DELETE_ESTACAO =
             "DROP TABLE IF EXISTS " + Estacao.TABLE_NAME;
-
     private static final String SQL_DELETE_ESTACAO_DA_LINHA =
             "DROP TABLE IF EXISTS " + EstacaoDaLinha.TABLE_NAME;
-
     private static final String SQL_DELETE_LINHA =
             "DROP TABLE IF EXISTS " + Linha.TABLE_NAME;
-
     private static final String SQL_DELETE_PARAGEM =
             "DROP TABLE IF EXISTS " + Paragem.TABLE_NAME;
-
     private static final String SQL_DELETE_PLATAFORMA =
             "DROP TABLE IF EXISTS " + Plataforma.TABLE_NAME;
-
     private static final String SQL_DELETE_PONTO =
             "DROP TABLE IF EXISTS " + Ponto.TABLE_NAME;
-
     private static final String SQL_DELETE_PONTO_DO_TRACADO =
             "DROP TABLE IF EXISTS " + PontoDoTracado.TABLE_NAME;
-
     private static final String SQL_DELETE_TRACADO =
             "DROP TABLE IF EXISTS " + Tracado.TABLE_NAME;
-
     private static final String SQL_DELETE_TRACADO_DA_LINHA =
             "DROP TABLE IF EXISTS " + TracadoDaLinha.TABLE_NAME;
-
     private static final String SQL_DELETE_VERSAO =
             "DROP TABLE IF EXISTS " + Versao.TABLE_NAME;
+    private static CreateTableStatementHelper baseCreateTable = null;
     private static HashMap<String, String> linhaProjectionMap;
     private static HashMap<String, String> corridaProjectionMap;
     private static HashMap<String, String> tracadoProjectionMap;
@@ -199,19 +114,193 @@ public class UrbaniceDbHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+    private static CreateTableStatementHelper getBaseSqlCreateTable() throws SqliteHelperException {
+        if (baseCreateTable == null) {
+            baseCreateTable = new CreateTableStatementHelper();
+            baseCreateTable.setIfNotExists(true);
+            baseCreateTable.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(BaseColumns._ID)
+                    .addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint.PRIMARY_KEY)));
+        }
+        return baseCreateTable;
+    }
+
+    private static String getSqlCreateTableCorrida() throws SqliteHelperException {
+        CreateTableStatementHelper createTableStatementHelper = new CreateTableStatementHelper(UrbaniceDbHelper.getBaseSqlCreateTable());
+
+        createTableStatementHelper.setTableName(Corrida.TABLE_NAME);
+        
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Corrida.COLUMN_NAME_ID_LINHA)
+                .addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Corrida.COLUMN_NAME_ACTIVA)
+                .addTypeName(TypeName.BOOL).addColumnConstraint(ColumnConstraint.NOT_NULL).setDefaultValue("0")));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Corrida.COLUMN_NAME_NO_DOMINGO)
+                .addTypeName(TypeName.BOOL).addColumnConstraint(ColumnConstraint.NOT_NULL).setDefaultValue("0")));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Corrida.COLUMN_NAME_NA_SEGUNDA)
+                .addTypeName(TypeName.BOOL).addColumnConstraint(ColumnConstraint.NOT_NULL).setDefaultValue("0")));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Corrida.COLUMN_NAME_NA_TERCA)
+                .addTypeName(TypeName.BOOL).addColumnConstraint(ColumnConstraint.NOT_NULL).setDefaultValue("0")));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Corrida.COLUMN_NAME_NA_QUARTA)
+                .addTypeName(TypeName.BOOL).addColumnConstraint(ColumnConstraint.NOT_NULL).setDefaultValue("0")));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Corrida.COLUMN_NAME_NA_QUINTA)
+                .addTypeName(TypeName.BOOL).addColumnConstraint(ColumnConstraint.NOT_NULL).setDefaultValue("0")));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Corrida.COLUMN_NAME_NA_SEXTA)
+                .addTypeName(TypeName.BOOL).addColumnConstraint(ColumnConstraint.NOT_NULL).setDefaultValue("0")));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Corrida.COLUMN_NAME_NO_SABADO)
+                .addTypeName(TypeName.BOOL).addColumnConstraint(ColumnConstraint.NOT_NULL).setDefaultValue("0")));
+
+        return new CreateTableStatementHelper(createTableStatementHelper).getCreateTable();
+    }
+
+    private static String getSqlCreateTableEstacao() throws SqliteHelperException {
+        CreateTableStatementHelper createTableStatementHelper = new CreateTableStatementHelper(UrbaniceDbHelper.getBaseSqlCreateTable());
+
+        createTableStatementHelper.setTableName(Estacao.TABLE_NAME);
+
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Estacao.COLUMN_NAME_ID_PONTO)
+                .addTypeName(TypeName.INTEGER)));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Estacao
+                .COLUMN_NAME_NOME).addTypeName(TypeName.TEXT).addColumnConstraint(ColumnConstraint
+                .NOT_NULL)));
+
+        return new CreateTableStatementHelper(createTableStatementHelper).getCreateTable();
+    }
+
+    private static String getSqlCreateTableEstacaoDaLinha() throws SqliteHelperException {
+        CreateTableStatementHelper createTableStatementHelper = new CreateTableStatementHelper(UrbaniceDbHelper.getBaseSqlCreateTable());
+
+        createTableStatementHelper.setTableName(EstacaoDaLinha.TABLE_NAME);
+
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(EstacaoDaLinha.COLUMN_NAME_ID_ESTACAO)
+                .addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(EstacaoDaLinha
+                .COLUMN_NAME_ID_LINHA).addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint
+                .NOT_NULL)));
+
+        return new CreateTableStatementHelper(createTableStatementHelper).getCreateTable();
+    }
+
+    private static String getSqlCreateTableLinha() throws SqliteHelperException {
+        CreateTableStatementHelper createTableStatementHelper = new CreateTableStatementHelper(UrbaniceDbHelper.getBaseSqlCreateTable());
+
+        createTableStatementHelper.setTableName(Linha.TABLE_NAME);
+
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Linha.COLUMN_NAME_NOME)
+                .addTypeName(TypeName.TEXT).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+
+        return new CreateTableStatementHelper(createTableStatementHelper).getCreateTable();
+    }
+
+    private static String getSqlCreateTableParagem() throws SqliteHelperException {
+        CreateTableStatementHelper createTableStatementHelper = new CreateTableStatementHelper(UrbaniceDbHelper.getBaseSqlCreateTable());
+
+        createTableStatementHelper.setTableName(Paragem.TABLE_NAME);
+
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Paragem.COLUMN_NAME_ID_CORRIDA)
+                .addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Paragem.COLUMN_NAME_ID_PLATAFORMA)
+                .addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Paragem.COLUMN_NAME_HORA_DO_DIA)
+                .addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Paragem.COLUMN_NAME_MINUTO_DA_HORA)
+                .addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+
+        return new CreateTableStatementHelper(createTableStatementHelper).getCreateTable();
+    }
+
+    private static String getSqlCreateTablePlataforma() throws SqliteHelperException {
+        CreateTableStatementHelper createTableStatementHelper = new CreateTableStatementHelper(UrbaniceDbHelper.getBaseSqlCreateTable());
+
+        createTableStatementHelper.setTableName(Plataforma.TABLE_NAME);
+
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Plataforma.COLUMN_NAME_ID_ESTACAO)
+                .addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Plataforma.COLUMN_NAME_ID_PONTO)
+                .addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+
+        return new CreateTableStatementHelper(createTableStatementHelper).getCreateTable();
+    }
+
+    private static String getSqlCreateTablePonto() throws SqliteHelperException {
+        CreateTableStatementHelper createTableStatementHelper = new CreateTableStatementHelper(UrbaniceDbHelper.getBaseSqlCreateTable());
+
+        createTableStatementHelper.setTableName(Ponto.TABLE_NAME);
+
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Ponto.COLUMN_NAME_LATITUDE)
+                .addTypeName(TypeName.DOUBLE).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Ponto.COLUMN_NAME_LONGITUDE)
+                .addTypeName(TypeName.DOUBLE).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Ponto.COLUMN_NAME_ALTITUDE)
+                .addTypeName(TypeName.DOUBLE)));
+
+        return new CreateTableStatementHelper(createTableStatementHelper).getCreateTable();
+    }
+
+    private static String getSqlCreateTablePontoDoTracado() throws SqliteHelperException {
+        CreateTableStatementHelper createTableStatementHelper = new CreateTableStatementHelper(UrbaniceDbHelper.getBaseSqlCreateTable());
+
+        createTableStatementHelper.setTableName(PontoDoTracado.TABLE_NAME);
+
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(PontoDoTracado.COLUMN_NAME_ID_PONTO)
+                .addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(PontoDoTracado.COLUMN_NAME_ID_TRACADO)
+                .addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(PontoDoTracado.COLUMN_NAME_ORDEM)
+                .addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+
+        return new CreateTableStatementHelper(createTableStatementHelper).getCreateTable();
+    }
+
+    private static String getSqlCreateTableTracado() throws SqliteHelperException {
+        CreateTableStatementHelper createTableStatementHelper = new CreateTableStatementHelper(UrbaniceDbHelper.getBaseSqlCreateTable());
+
+        createTableStatementHelper.setTableName(Tracado.TABLE_NAME);
+
+        return new CreateTableStatementHelper(createTableStatementHelper).getCreateTable();
+    }
+
+    private static String getSqlCreateTableTracadoDaLinha() throws SqliteHelperException {
+        CreateTableStatementHelper createTableStatementHelper = new CreateTableStatementHelper(UrbaniceDbHelper.getBaseSqlCreateTable());
+
+        createTableStatementHelper.setTableName(TracadoDaLinha.TABLE_NAME);
+
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(TracadoDaLinha.COLUMN_NAME_ID_TRACADO)
+                .addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(TracadoDaLinha.COLUMN_NAME_ID_LINHA)
+                .addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+
+        return new CreateTableStatementHelper(createTableStatementHelper).getCreateTable();
+    }
+
+    private static String getSqlCreateTableVersao() throws SqliteHelperException {
+        CreateTableStatementHelper createTableStatementHelper = new CreateTableStatementHelper(Versao.TABLE_NAME, null, false, true);
+
+        createTableStatementHelper.setTableName(Versao.TABLE_NAME);
+
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Versao.COLUMN_NAME_DESIGNACAO)
+                .addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+        createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Versao.COLUMN_NAME_VALOR)
+                .addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint.NOT_NULL)));
+
+        return new CreateTableStatementHelper(createTableStatementHelper).getCreateTable();
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(SQL_CREATE_CORRIDA);
-        db.execSQL(SQL_CREATE_ESTACAO);
-        db.execSQL(SQL_CREATE_ESTACAO_DA_LINHA);
-        db.execSQL(SQL_CREATE_LINHA);
-        db.execSQL(SQL_CREATE_PARAGEM);
-        db.execSQL(SQL_CREATE_PLATAFORMA);
-        db.execSQL(SQL_CREATE_PONTO);
-        db.execSQL(SQL_CREATE_PONTO_DO_TRACADO);
-        db.execSQL(SQL_CREATE_TRACADO);
-        db.execSQL(SQL_CREATE_TRACADO_DA_LINHA);
-        db.execSQL(SQL_CREATE_VERSAO);
+        try {
+            db.execSQL(UrbaniceDbHelper.getSqlCreateTableCorrida());
+            db.execSQL(UrbaniceDbHelper.getSqlCreateTableEstacao());
+            db.execSQL(UrbaniceDbHelper.getSqlCreateTableEstacaoDaLinha());
+            db.execSQL(UrbaniceDbHelper.getSqlCreateTableLinha());
+            db.execSQL(UrbaniceDbHelper.getSqlCreateTableParagem());
+            db.execSQL(UrbaniceDbHelper.getSqlCreateTablePlataforma());
+            db.execSQL(UrbaniceDbHelper.getSqlCreateTablePonto());
+            db.execSQL(UrbaniceDbHelper.getSqlCreateTablePontoDoTracado());
+            db.execSQL(UrbaniceDbHelper.getSqlCreateTableTracado());
+            db.execSQL(UrbaniceDbHelper.getSqlCreateTableTracadoDaLinha());
+            db.execSQL(UrbaniceDbHelper.getSqlCreateTableVersao());
+        } catch (SqliteHelperException e) {
+            e.printStackTrace(); // TODO: Tratar desta excepção
+        }
     }
 
     @Override
@@ -257,7 +346,7 @@ public class UrbaniceDbHelper extends SQLiteOpenHelper {
     }
 
     public Cursor queryLinha(String[] projectionIn, String selection, String[] selectionArgs, String groupBy, String having,
-                             String sortOrder, String limit){
+                             String sortOrder, String limit) {
         return query(projectionIn, selection, selectionArgs, groupBy, having, sortOrder, limit, Linha.TABLE_NAME, linhaProjectionMap);
     }
 

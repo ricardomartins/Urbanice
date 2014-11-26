@@ -48,7 +48,7 @@ public class ColumnDefinition {
 
     }
 
-    final String columnName;
+    private String columnName;
 
     private Set<TypeName> typeNames;
 
@@ -56,15 +56,24 @@ public class ColumnDefinition {
 
     private String defaultValue;
 
-    public ColumnDefinition(String columnName) throws SqliteHelperException {
-        Matcher m = columnNamePattern.matcher(columnName);
-        if (!m.find())
-            throw new SqliteHelperException("Malformed column name");
-        this.columnName = m.group();
-
+    public ColumnDefinition() {
         typeNames = new HashSet<TypeName>();
         columnConstraints = new HashSet<ColumnConstraint>();
         resetDefault();
+    }
+
+    public ColumnDefinition(String columnName) throws SqliteHelperException {
+        this();
+        setColumnName(columnName);
+    }
+
+    public ColumnDefinition(Builder columnDefinitionBuilder) throws SqliteHelperException {
+        this(columnDefinitionBuilder.getColumnName());
+        for (TypeName typeName : columnDefinitionBuilder.getTypeNames())
+            addTypeName(typeName);
+        for (ColumnConstraint columnConstraint : columnDefinitionBuilder.getColumnConstraints())
+            addColumnConstraint(columnConstraint);
+        setDefault(columnDefinitionBuilder.getDefaultValue());
     }
 
     public void addTypeName(TypeName typeName) {
@@ -75,18 +84,27 @@ public class ColumnDefinition {
         columnConstraints.add(columnConstraint);
     }
 
-    public String setDefault(String defaultValue) {
+    public void setDefault(String defaultValue) {
         this.defaultValue = defaultValue;
-        return getDefault();
     }
 
-    public String resetDefault() {
+    public void resetDefault() {
         defaultValue = null;
-        return getDefault();
     }
 
     public String getDefault() {
         return (defaultValue == null) ? "" : (ColumnDefinition.DEFAULT_PSEUDO_CONSTRAINT + " " + defaultValue);
+    }
+
+    public void setColumnName(String columnName) throws SqliteHelperException {
+        Matcher m = columnNamePattern.matcher(columnName);
+        if (!m.find())
+            throw new SqliteHelperException("Malformed column name");
+        this.columnName = m.group();
+    }
+
+    public String getColumnName() {
+        return columnName;
     }
 
     public String getColumnDefinition() {
@@ -100,7 +118,56 @@ public class ColumnDefinition {
         return result.trim();
     }
 
-    public String getColumnName() {
-        return columnName;
+    public static class Builder {
+        private String columnName;
+
+        private Set<TypeName> typeNames;
+
+        private Set<ColumnConstraint> columnConstraints;
+
+        private String defaultValue;
+
+        public Builder() {
+            columnName = null;
+            typeNames = new HashSet<TypeName>();
+            columnConstraints = new HashSet<ColumnConstraint>();
+            defaultValue = null;
+        }
+
+        String getColumnName() {
+            return columnName;
+        }
+
+        public Builder setColumnName(String columnName) {
+            this.columnName = columnName;
+            return this;
+        }
+
+        Set<TypeName> getTypeNames() {
+            return typeNames;
+        }
+
+        public Builder addTypeName(TypeName typeName) {
+            this.typeNames.add(typeName);
+            return this;
+        }
+
+        Set<ColumnConstraint> getColumnConstraints() {
+            return columnConstraints;
+        }
+
+        public Builder addColumnConstraint(ColumnConstraint columnConstraint) {
+            this.columnConstraints.add(columnConstraint);
+            return this;
+        }
+
+        String getDefaultValue() {
+            return defaultValue;
+        }
+
+        public Builder setDefaultValue(String defaultValue) {
+            this.defaultValue = defaultValue;
+            return this;
+        }
     }
 }
