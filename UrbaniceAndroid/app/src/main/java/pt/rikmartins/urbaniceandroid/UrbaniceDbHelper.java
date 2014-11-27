@@ -35,29 +35,8 @@ public class UrbaniceDbHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "urbanice.db";
 
-    private static final String SQL_DELETE_CORRIDA =
-            "DROP TABLE IF EXISTS " + Corrida.TABLE_NAME;
-    private static final String SQL_DELETE_ESTACAO =
-            "DROP TABLE IF EXISTS " + Estacao.TABLE_NAME;
-    private static final String SQL_DELETE_ESTACAO_DA_LINHA =
-            "DROP TABLE IF EXISTS " + EstacaoDaLinha.TABLE_NAME;
-    private static final String SQL_DELETE_LINHA =
-            "DROP TABLE IF EXISTS " + Linha.TABLE_NAME;
-    private static final String SQL_DELETE_PARAGEM =
-            "DROP TABLE IF EXISTS " + Paragem.TABLE_NAME;
-    private static final String SQL_DELETE_PLATAFORMA =
-            "DROP TABLE IF EXISTS " + Plataforma.TABLE_NAME;
-    private static final String SQL_DELETE_PONTO =
-            "DROP TABLE IF EXISTS " + Ponto.TABLE_NAME;
-    private static final String SQL_DELETE_PONTO_DO_TRACADO =
-            "DROP TABLE IF EXISTS " + PontoDoTracado.TABLE_NAME;
-    private static final String SQL_DELETE_TRACADO =
-            "DROP TABLE IF EXISTS " + Tracado.TABLE_NAME;
-    private static final String SQL_DELETE_TRACADO_DA_LINHA =
-            "DROP TABLE IF EXISTS " + TracadoDaLinha.TABLE_NAME;
-    private static final String SQL_DELETE_VERSAO =
-            "DROP TABLE IF EXISTS " + Versao.TABLE_NAME;
     private static CreateTableStatementHelper baseCreateTable = null;
+
     private static HashMap<String, String> linhaProjectionMap;
     private static HashMap<String, String> corridaProjectionMap;
     private static HashMap<String, String> tracadoProjectionMap;
@@ -65,7 +44,6 @@ public class UrbaniceDbHelper extends SQLiteOpenHelper {
     private static HashMap<String, String> plataformaProjectionMap;
     private static HashMap<String, String> paragemProjectionMap;
     private static HashMap<String, String> pontoProjectionMap;
-
     static {
         linhaProjectionMap = new HashMap<String, String>();
         linhaProjectionMap.put(Linha._ID, Linha._ID);
@@ -128,7 +106,7 @@ public class UrbaniceDbHelper extends SQLiteOpenHelper {
         CreateTableStatementHelper createTableStatementHelper = new CreateTableStatementHelper(UrbaniceDbHelper.getBaseSqlCreateTable());
 
         createTableStatementHelper.setTableName(Corrida.TABLE_NAME);
-        
+
         createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Corrida.COLUMN_NAME_ID_LINHA)
                 .addTypeName(TypeName.INTEGER).addColumnConstraint(ColumnConstraint.NOT_NULL)));
         createTableStatementHelper.addColumnDefinition(new ColumnDefinition(new ColumnDefinition.Builder().setColumnName(Corrida.COLUMN_NAME_ACTIVA)
@@ -284,6 +262,10 @@ public class UrbaniceDbHelper extends SQLiteOpenHelper {
         return new CreateTableStatementHelper(createTableStatementHelper).getCreateTable();
     }
 
+    private static String getSqlDropTable(String tableName){
+        return "DROP TABLE IF EXISTS " + tableName;
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         try {
@@ -305,17 +287,17 @@ public class UrbaniceDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL(SQL_DELETE_CORRIDA);
-        db.execSQL(SQL_DELETE_ESTACAO);
-        db.execSQL(SQL_DELETE_ESTACAO_DA_LINHA);
-        db.execSQL(SQL_DELETE_LINHA);
-        db.execSQL(SQL_DELETE_PARAGEM);
-        db.execSQL(SQL_DELETE_PLATAFORMA);
-        db.execSQL(SQL_DELETE_PONTO);
-        db.execSQL(SQL_DELETE_PONTO_DO_TRACADO);
-        db.execSQL(SQL_DELETE_TRACADO);
-        db.execSQL(SQL_DELETE_TRACADO_DA_LINHA);
-        db.execSQL(SQL_DELETE_VERSAO);
+        db.execSQL(UrbaniceDbHelper.getSqlDropTable(Corrida.TABLE_NAME));
+        db.execSQL(UrbaniceDbHelper.getSqlDropTable(Estacao.TABLE_NAME));
+        db.execSQL(UrbaniceDbHelper.getSqlDropTable(EstacaoDaLinha.TABLE_NAME));
+        db.execSQL(UrbaniceDbHelper.getSqlDropTable(Linha.TABLE_NAME));
+        db.execSQL(UrbaniceDbHelper.getSqlDropTable(Paragem.TABLE_NAME));
+        db.execSQL(UrbaniceDbHelper.getSqlDropTable(Plataforma.TABLE_NAME));
+        db.execSQL(UrbaniceDbHelper.getSqlDropTable(Ponto.TABLE_NAME));
+        db.execSQL(UrbaniceDbHelper.getSqlDropTable(PontoDoTracado.TABLE_NAME));
+        db.execSQL(UrbaniceDbHelper.getSqlDropTable(Tracado.TABLE_NAME));
+        db.execSQL(UrbaniceDbHelper.getSqlDropTable(TracadoDaLinha.TABLE_NAME));
+        db.execSQL(UrbaniceDbHelper.getSqlDropTable(Versao.TABLE_NAME));
         onCreate(db);
     }
 

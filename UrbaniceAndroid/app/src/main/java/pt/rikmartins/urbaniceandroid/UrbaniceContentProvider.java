@@ -4,10 +4,7 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-
-import java.util.HashMap;
 
 import static pt.rikmartins.urbaniceandroid.UrbaniceContentProvider.ProviderContract.*;
 
